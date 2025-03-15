@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState, Fragment } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LandingPage from './components/LandingPage';
+import AdminDashboard from './components/AdminDashboard';
+import ManagerDashboard from './components/ManagerDashboard';
+import Dashboard from './components/Dashboard';
+import Login from './components/Login';
+import Register from './components/Register';
+import Logout from './components/Logout';
+import PrivateRoutes from './components/PrivateRoute'; // Import the private route component
 
-function App() {
+const App = () => {
+  const [role, setRole] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+      setRole(decoded.role);
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Fragment>
+        <Routes>
+          <Route element={<PrivateRoutes />}>
+            <Route element={<AdminDashboard />}/>
+            <Route element={<ManagerDashboard />}/>
+            <Route element={<Dashboard />}/>
+          </Route>
+          <Route path="/" element={<LandingPage />} />
+          <Route exact path='/login' element={<Login/>}/> 
+          <Route exact path='/register' element={<Register/>}/>
+          <Route exact path='/logout' element={<Logout/>}/>                  
+        </Routes>
+      </Fragment>
+    </Router>
   );
-}
+};
 
 export default App;
